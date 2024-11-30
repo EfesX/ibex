@@ -12,6 +12,7 @@ contributed to what is called Ibex today. If you made a contribution to Ibex
 in the form of source code, bug reports, testing, marketing, or any other form,
 please feel free to open a pull request to get your name added to this file.
 
+
 - Alex Bradbury
 - Andreas Kurth
 - Andreas Traber
