@@ -5,6 +5,7 @@
 /**
  * Top level module of the register file implementation
  */
+ 
 module ibex_register_file import ibex_pkg::*; #(
   parameter regfile_e                          RegFile           = RegFileFF,
   parameter bit                                RV32E             = 0        ,
