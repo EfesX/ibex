@@ -1,6 +1,11 @@
-import ibex_pkg::*;
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
 
-module ibex_register_file #(
+/**
+ * Top level module of the register file implementation
+ */
+module ibex_register_file import ibex_pkg::*; #(
   parameter regfile_e                          RegFile           = RegFileFF,
   parameter bit                                RV32E             = 0        ,
   parameter int       unsigned                 DataWidth         = 32       ,
