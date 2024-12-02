@@ -32,7 +32,7 @@ module ibex_register_file #(
     localparam int unsigned NUM_WORDS  = 2**ADDR_WIDTH;
 
     if (WrenCheck) begin : gen_wren_check
-        if (RegFile != RegFileFPGA) begin
+        if (RegFile != RegFileFPGA) begin : gen_wren_check_fpga
             logic [NUM_WORDS-1:0] we_a_dec_buf;
             logic [NUM_WORDS-1:0] waddr_a_onehot;
 
@@ -53,11 +53,11 @@ module ibex_register_file #(
                 .en_i  (we_a_i      ),
                 .err_o (err_o       )
             );
-        end else begin
+        end else begin : gen_wren_check_ff_or_latch
             logic we_a_rf_fpga;
             assign err_o = we_a_rf_fpga && !we_a_i;
         end
-    end else begin
+    end else begin : gen_no_wren_check
         assign err_o = 1'b0;
     end
 
