@@ -8,6 +8,7 @@
  
  module ibex_register_file import ibex_pkg::*; #(
     parameter regfile_e                          RegFile           = RegFileFF,
+    parameter bit                                RdataMuxCheck     = 0        ,
     parameter bit                                RV32E             = 0        ,
     parameter int       unsigned                 DataWidth         = 32       ,
     parameter bit                                DummyInstructions = 0        ,
