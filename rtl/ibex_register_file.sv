@@ -67,66 +67,85 @@
       assign err_o = 1'b0;
     end
   
-    if (RegFile == RegFileFPGA) begin : gen_regfile_fpga
-      ibex_register_file_fpga # (
-        .NumWords           (NUM_WORDS          ),
-        .DataWidth          (DataWidth          ),
-        .DummyInstructions  (DummyInstructions  )
-      ) register_file_fpga (
-        .clk_i              (clk_i              ),
-        .rst_ni             (rst_ni             ),
-        .test_en_i          (test_en_i          ),
-        .dummy_instr_id_i   (dummy_instr_id_i   ),
-        .dummy_instr_wb_i   (dummy_instr_wb_i   ),
-        .raddr_a_i          (raddr_a_i          ),
-        .rdata_a_o          (rdata_a_o          ),
-        .raddr_b_i          (raddr_b_i          ),
-        .rdata_b_o          (rdata_b_o          ),
-        .waddr_a_i          (waddr_a_i          ),
-        .wdata_a_i          (wdata_a_i          ),
-        .we_a_i             (we_a_i             ),
-        .we_a_o             (we_a_rf_fpga       )
-      );
-    end else if (RegFile == RegFileFF) begin : gen_regfile_ff
-      ibex_register_file_ff # (
-        .NumWords           (NUM_WORDS          ),
-        .DataWidth          (DataWidth          ),
-        .DummyInstructions  (DummyInstructions  )
-      ) register_file_ff (
-        .clk_i              (clk_i              ),
-        .rst_ni             (rst_ni             ),
-        .test_en_i          (test_en_i          ),
-        .dummy_instr_id_i   (dummy_instr_id_i   ),
-        .dummy_instr_wb_i   (dummy_instr_wb_i   ),
-        .raddr_a_i          (raddr_a_i          ),
-        .rdata_a_o          (rdata_a_o          ),
-        .raddr_b_i          (raddr_b_i          ),
-        .rdata_b_o          (rdata_b_o          ),
-        .waddr_a_i          (waddr_a_i          ),
-        .wdata_a_i          (wdata_a_i          ),
-        .we_a_i             (we_a_i             ),
-        .waddr_a_onehot_o   (waddr_a_onehot     )
-      );
-    end else if (RegFile == RegFileLatch) begin : gen_regfile_latch
-      ibex_register_file_latch # (
-        .NumWords           (NUM_WORDS          ),
-        .DataWidth          (DataWidth          ),
-        .DummyInstructions  (DummyInstructions  )
-      ) ibex_register_file_latch (
-        .clk_i              (clk_i              ),
-        .rst_ni             (rst_ni             ),
-        .test_en_i          (test_en_i          ),
-        .dummy_instr_id_i   (dummy_instr_id_i   ),
-        .dummy_instr_wb_i   (dummy_instr_wb_i   ),
-        .raddr_a_i          (raddr_a_i          ),
-        .rdata_a_o          (rdata_a_o          ),
-        .raddr_b_i          (raddr_b_i          ),
-        .rdata_b_o          (rdata_b_o          ),
-        .waddr_a_i          (waddr_a_i          ),
-        .wdata_a_i          (wdata_a_i          ),
-        .we_a_i             (we_a_i             ),
-        .waddr_a_onehot_o   (waddr_a_onehot     )
-      );
-    end
+    if (RegFile == RegFileFF) begin : gen_regfile_ff
+        ibex_register_file_ff #(
+          .RV32E            (RV32E),
+          .DataWidth        (RegFileDataWidth),
+          .DummyInstructions(DummyInstructions),
+          // SEC_CM: DATA_REG_SW.GLITCH_DETECT
+          .WrenCheck        (RegFileWrenCheck),
+          .RdataMuxCheck    (RegFileRdataMuxCheck),
+          .WordZeroVal      (RegFileDataWidth'(prim_secded_pkg::SecdedInv3932ZeroWord))
+        ) register_file_i (
+          .clk_i (clk),
+          .rst_ni(rst_ni),
+    
+          .test_en_i       (test_en_i),
+          .dummy_instr_id_i(dummy_instr_id),
+          .dummy_instr_wb_i(dummy_instr_wb),
+    
+          .raddr_a_i(rf_raddr_a),
+          .rdata_a_o(rf_rdata_a_ecc),
+          .raddr_b_i(rf_raddr_b),
+          .rdata_b_o(rf_rdata_b_ecc),
+          .waddr_a_i(rf_waddr_wb),
+          .wdata_a_i(rf_wdata_wb_ecc),
+          .we_a_i   (rf_we_wb),
+          .err_o    (rf_alert_major_internal)
+        );
+      end else if (RegFile == RegFileFPGA) begin : gen_regfile_fpga
+        ibex_register_file_fpga #(
+          .RV32E            (RV32E),
+          .DataWidth        (RegFileDataWidth),
+          .DummyInstructions(DummyInstructions),
+          // SEC_CM: DATA_REG_SW.GLITCH_DETECT
+          .WrenCheck        (RegFileWrenCheck),
+          .RdataMuxCheck    (RegFileRdataMuxCheck),
+          .WordZeroVal      (RegFileDataWidth'(prim_secded_pkg::SecdedInv3932ZeroWord))
+        ) register_file_i (
+          .clk_i (clk),
+          .rst_ni(rst_ni),
+    
+          .test_en_i       (test_en_i),
+          .dummy_instr_id_i(dummy_instr_id),
+          .dummy_instr_wb_i(dummy_instr_wb),
+    
+          .raddr_a_i(rf_raddr_a),
+          .rdata_a_o(rf_rdata_a_ecc),
+          .raddr_b_i(rf_raddr_b),
+          .rdata_b_o(rf_rdata_b_ecc),
+          .waddr_a_i(rf_waddr_wb),
+          .wdata_a_i(rf_wdata_wb_ecc),
+          .we_a_i   (rf_we_wb),
+          .err_o    (rf_alert_major_internal)
+        );
+      end else if (RegFile == RegFileLatch) begin : gen_regfile_latch
+        ibex_register_file_latch #(
+          .RV32E            (RV32E),
+          .DataWidth        (RegFileDataWidth),
+          .DummyInstructions(DummyInstructions),
+          // SEC_CM: DATA_REG_SW.GLITCH_DETECT
+          .WrenCheck        (RegFileWrenCheck),
+          .RdataMuxCheck    (RegFileRdataMuxCheck),
+          .WordZeroVal      (RegFileDataWidth'(prim_secded_pkg::SecdedInv3932ZeroWord))
+        ) register_file_i (
+          .clk_i (clk),
+          .rst_ni(rst_ni),
+    
+          .test_en_i       (test_en_i),
+          .dummy_instr_id_i(dummy_instr_id),
+          .dummy_instr_wb_i(dummy_instr_wb),
+    
+          .raddr_a_i(rf_raddr_a),
+          .rdata_a_o(rf_rdata_a_ecc),
+          .raddr_b_i(rf_raddr_b),
+          .rdata_b_o(rf_rdata_b_ecc),
+          .waddr_a_i(rf_waddr_wb),
+          .wdata_a_i(rf_wdata_wb_ecc),
+          .we_a_i   (rf_we_wb),
+          .err_o    (rf_alert_major_internal)
+        );
+      end
+    
   endmodule
   
