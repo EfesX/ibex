@@ -422,86 +422,32 @@ module ibex_top import ibex_pkg::*; #(
   // Register file Instantiation //
   /////////////////////////////////
 
-  logic rf_alert_major_internal;
-  if (RegFile == RegFileFF) begin : gen_regfile_ff
-    ibex_register_file_ff #(
-      .RV32E            (RV32E),
-      .DataWidth        (RegFileDataWidth),
-      .DummyInstructions(DummyInstructions),
-      // SEC_CM: DATA_REG_SW.GLITCH_DETECT
-      .WrenCheck        (RegFileWrenCheck),
-      .RdataMuxCheck    (RegFileRdataMuxCheck),
-      .WordZeroVal      (RegFileDataWidth'(prim_secded_pkg::SecdedInv3932ZeroWord))
-    ) register_file_i (
-      .clk_i (clk),
-      .rst_ni(rst_ni),
+  ibex_register_file #(
+    .RegFile          (RegFile),
+    .RV32E            (RV32E),
+    .DataWidth        (RegFileDataWidth),
+    .DummyInstructions(DummyInstructions),
+    // SEC_CM: DATA_REG_SW.GLITCH_DETECT
+    .WrenCheck        (RegFileWrenCheck),
+    .RdataMuxCheck    (RegFileRdataMuxCheck),
+    .WordZeroVal      (RegFileDataWidth'(prim_secded_pkg::SecdedInv3932ZeroWord))
+  ) register_file (
+    .clk_i (clk),
+    .rst_ni(rst_ni),
 
-      .test_en_i       (test_en_i),
-      .dummy_instr_id_i(dummy_instr_id),
-      .dummy_instr_wb_i(dummy_instr_wb),
+    .test_en_i       (test_en_i),
+    .dummy_instr_id_i(dummy_instr_id),
+    .dummy_instr_wb_i(dummy_instr_wb),
 
-      .raddr_a_i(rf_raddr_a),
-      .rdata_a_o(rf_rdata_a_ecc),
-      .raddr_b_i(rf_raddr_b),
-      .rdata_b_o(rf_rdata_b_ecc),
-      .waddr_a_i(rf_waddr_wb),
-      .wdata_a_i(rf_wdata_wb_ecc),
-      .we_a_i   (rf_we_wb),
-      .err_o    (rf_alert_major_internal)
-    );
-  end else if (RegFile == RegFileFPGA) begin : gen_regfile_fpga
-    ibex_register_file_fpga #(
-      .RV32E            (RV32E),
-      .DataWidth        (RegFileDataWidth),
-      .DummyInstructions(DummyInstructions),
-      // SEC_CM: DATA_REG_SW.GLITCH_DETECT
-      .WrenCheck        (RegFileWrenCheck),
-      .RdataMuxCheck    (RegFileRdataMuxCheck),
-      .WordZeroVal      (RegFileDataWidth'(prim_secded_pkg::SecdedInv3932ZeroWord))
-    ) register_file_i (
-      .clk_i (clk),
-      .rst_ni(rst_ni),
-
-      .test_en_i       (test_en_i),
-      .dummy_instr_id_i(dummy_instr_id),
-      .dummy_instr_wb_i(dummy_instr_wb),
-
-      .raddr_a_i(rf_raddr_a),
-      .rdata_a_o(rf_rdata_a_ecc),
-      .raddr_b_i(rf_raddr_b),
-      .rdata_b_o(rf_rdata_b_ecc),
-      .waddr_a_i(rf_waddr_wb),
-      .wdata_a_i(rf_wdata_wb_ecc),
-      .we_a_i   (rf_we_wb),
-      .err_o    (rf_alert_major_internal)
-    );
-  end else if (RegFile == RegFileLatch) begin : gen_regfile_latch
-    ibex_register_file_latch #(
-      .RV32E            (RV32E),
-      .DataWidth        (RegFileDataWidth),
-      .DummyInstructions(DummyInstructions),
-      // SEC_CM: DATA_REG_SW.GLITCH_DETECT
-      .WrenCheck        (RegFileWrenCheck),
-      .RdataMuxCheck    (RegFileRdataMuxCheck),
-      .WordZeroVal      (RegFileDataWidth'(prim_secded_pkg::SecdedInv3932ZeroWord))
-    ) register_file_i (
-      .clk_i (clk),
-      .rst_ni(rst_ni),
-
-      .test_en_i       (test_en_i),
-      .dummy_instr_id_i(dummy_instr_id),
-      .dummy_instr_wb_i(dummy_instr_wb),
-
-      .raddr_a_i(rf_raddr_a),
-      .rdata_a_o(rf_rdata_a_ecc),
-      .raddr_b_i(rf_raddr_b),
-      .rdata_b_o(rf_rdata_b_ecc),
-      .waddr_a_i(rf_waddr_wb),
-      .wdata_a_i(rf_wdata_wb_ecc),
-      .we_a_i   (rf_we_wb),
-      .err_o    (rf_alert_major_internal)
-    );
-  end
+    .raddr_a_i(rf_raddr_a),
+    .rdata_a_o(rf_rdata_a_ecc),
+    .raddr_b_i(rf_raddr_b),
+    .rdata_b_o(rf_rdata_b_ecc),
+    .waddr_a_i(rf_waddr_wb),
+    .wdata_a_i(rf_wdata_wb_ecc),
+    .we_a_i   (rf_we_wb),
+    .err_o    (rf_alert_major_internal)
+  );
 
   ///////////////////////////////
   // Scrambling Infrastructure //
